@@ -1,0 +1,31 @@
+{% extends 'ProjectApp/main.html' %}
+
+{% block content %}
+<br>
+
+<div class='row-md-1'>
+    <div class=col-md-4>
+        <div class='card card-body'>
+            <p><strong>Program:</strong> {{dept}}</p><br>
+            <p><strong>Course:</strong> {{name}}</p><br>
+            <p><strong>ID:</strong> {{id_0}}</p><br>
+
+            {% if Avg > 3.8 %}
+            <strong style="color: green;">Rating: {{Avg}} </strong>
+            {% elif Avg > 2.5 %}
+            <strong style="color: orange;">Rating: {{Avg}} </strong>
+            {% else %}
+            <strong style="color: red;">Rating: {{Avg}} </strong>
+            
+            {% endif %}
+        </div>
+        <div class='card card-body'>
+            {% include 'ProjectApp/commentForm.html' %}
+        </div>
+    </div>
+</div>
+{% include 'ProjectApp/comments.html' %}
+
+
+
+{% endblock %}

@@ -1,0 +1,16 @@
+<br>
+<div class='row-md-1'>
+    <div class=col-md-12>
+        <h2>Comments</h2>
+            {% for c, t, r in zip %}
+            <div class="card" style="width: 100%;">
+                <div class="card-body">
+                  <h5 class="card-title">{{c}}</h5>
+                  <h6 class="card-subtitle mb-2 text-muted">{{t}}</h6>
+                  <p style="text-align: right;">Rated: <strong>{{r}}</strong></p>
+                </div>
+            </div>
+            {% endfor %}
+    </div>
+</div>
+

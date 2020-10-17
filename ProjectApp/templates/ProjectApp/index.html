@@ -1,0 +1,25 @@
+{% extends 'ProjectApp/main.html' %}
+
+{% block content %}
+<br>
+
+<div class='row-md-1'>
+    <div class=col-md-3>
+        <div class='card card-body'>
+            <form action="" method="POST">
+                {% csrf_token %}
+                {{form.as_p}}
+                <input class="btn btn-success btn-sm" type="submit" name='submit' value="Confirm">
+            </form>
+            <!--
+            <br>
+            {% if err != "" %}
+                <p style="color: red;">Error Class not found</p>
+            {% endif %}
+        -->
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
