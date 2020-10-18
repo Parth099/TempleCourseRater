@@ -3,9 +3,9 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django import forms
 
 class Course(models.Model):
-    CourseID = models.CharField(max_length=5)
-    Program = models.CharField(max_length=200, null=True)
-    CourseName =  models.CharField(max_length=300, null=True)
+    CourseID = models.CharField(max_length=5, blank=True)
+    Program = models.CharField(max_length=200, null=True, blank=True)
+    CourseName =  models.CharField(max_length=300, null=True, blank=True)
 
     def __str__(self):
         return self.CourseName

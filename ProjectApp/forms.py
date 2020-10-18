@@ -5,7 +5,7 @@ from .models import *
 class CourseForm(ModelForm):
     class Meta:
         model = Course
-        fields = ('CourseID', 'Program')
+        fields = ('CourseID', 'Program',)
 
 class CommentForm(ModelForm):
     

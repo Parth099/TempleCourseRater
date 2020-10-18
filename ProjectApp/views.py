@@ -15,17 +15,31 @@ def inputDB():
 def index(request):
     form = CourseForm()
     if request.method == "POST":
+        print("!!-"+request.POST['CourseName']+"-!!")
         form = CourseForm(request.POST)
         if form.is_valid():
-            try:
-                P0 = request.POST['Program'].upper()
-                C = Course.objects.get(CourseID=request.POST['CourseID'].upper(), Program=P0)
-                errMSG = ""
-                return redirect(f'/{C.Program}/{C.CourseID}')
-            except:
-                pass
+            if request.POST['CourseName'] == "":
+                print("rq.post is empty proceed")
+                try:
+                    P0 = request.POST['Program'].upper()
+                    C = Course.objects.get(CourseID=request.POST['CourseID'].upper(), Program=P0)
+                    return redirect(f'/{C.Program}/{C.CourseID}')
+                except:
+                    pass
+            else:
+                print("rq.post is not empty proceed")
+                try:
+                    C = Course.objects.get(CourseName=request.POST['CourseName'])
+                    print("!!!!!!!!!!!!!!Calling CoursePage!!!!!!!!!!!!!!!!!!!!!")
+                    return redirect(f'/{C.Program}/{C.CourseID}')
+                except:
+                    var = request.POST['CourseName']
+                    print("!!!!!!!!!!!!!!Calling Search!!!!!!!!!!!!!!!!!!!!!!!")
+                    return redirect(f'/search/{var}')
+
+        
         return redirect('/')
-    context = {'form':form}
+    context = {'form':form,}
     return render(request, 'ProjectApp/index.html', {'form':form})
 
 def CoursePage(request, dept, Id):
@@ -55,14 +69,12 @@ def CoursePage(request, dept, Id):
         times = ''
 
     comment_Count = C.comments_set.all().count()
-    print(comment_Count)
-
+    
     if comment_Count == 0:
         RatingSum = "None"
     else:
         RatingSum = round(RatingSum/comment_Count, 2)
 
-    print(comments)
     context = {
         "name" : C.CourseName,
         "id_0" : C.CourseID,
@@ -71,5 +83,14 @@ def CoursePage(request, dept, Id):
         'zip': zip(comments, times, rate),
         "Avg": RatingSum,
     }
-    print(zip(comments, times))
+
     return render(request, 'ProjectApp/C_page.html', context)
+
+def searchCourses(request, query):
+    C = Course.objects.all()
+    output = []
+    for course in C:
+        if query.lower() in course.CourseName.lower():
+            output.append(course)
+
+    return render(request, "ProjectApp/search.html" ,{"output":output, "Q": query})
