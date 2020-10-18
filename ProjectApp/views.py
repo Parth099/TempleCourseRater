@@ -15,11 +15,12 @@ def inputDB():
 def index(request):
     form = CourseForm()
     if request.method == "POST":
-        print("!!-"+request.POST['CourseName']+"-!!")
+        srcBar = request.POST.get('SearchBar', "")
+        if srcBar != "":
+            return searchCourses(request, srcBar)
         form = CourseForm(request.POST)
         if form.is_valid():
-            if request.POST['CourseName'] == "":
-                print("rq.post is empty proceed")
+            if request.POST.get('CourseName', "") == "":
                 try:
                     P0 = request.POST['Program'].upper()
                     C = Course.objects.get(CourseID=request.POST['CourseID'].upper(), Program=P0)
@@ -27,14 +28,11 @@ def index(request):
                 except:
                     pass
             else:
-                print("rq.post is not empty proceed")
                 try:
                     C = Course.objects.get(CourseName=request.POST['CourseName'])
-                    print("!!!!!!!!!!!!!!Calling CoursePage!!!!!!!!!!!!!!!!!!!!!")
                     return redirect(f'/{C.Program}/{C.CourseID}')
                 except:
                     var = request.POST['CourseName']
-                    print("!!!!!!!!!!!!!!Calling Search!!!!!!!!!!!!!!!!!!!!!!!")
                     return redirect(f'/search/{var}')
 
         
@@ -43,12 +41,14 @@ def index(request):
     return render(request, 'ProjectApp/index.html', {'form':form})
 
 def CoursePage(request, dept, Id):
-    #print(dept, Id)
+
     C = Course.objects.get(CourseID=Id, Program=dept)
     OrderFormSet = inlineformset_factory(Course, Comments, fields=('comment','course','rating'), extra=1)
     formset = OrderFormSet(queryset=Comments.objects.none(),instance=C)
     if request.method == "POST":
-        #print("P:", request.POST)
+        srcBar = request.POST.get('SearchBar', "")
+        if srcBar != "":
+            return searchCourses(request, srcBar)
         formset = OrderFormSet(request.POST, instance=C)
         if formset.is_valid(): 
             formset.save()
@@ -87,10 +87,16 @@ def CoursePage(request, dept, Id):
     return render(request, 'ProjectApp/C_page.html', context)
 
 def searchCourses(request, query):
+    if request.method == "POST":
+        print(request.POST)
     C = Course.objects.all()
     output = []
     for course in C:
         if query.lower() in course.CourseName.lower():
             output.append(course)
 
-    return render(request, "ProjectApp/search.html" ,{"output":output, "Q": query})
+    if C.filter(Program=query).count() > 0:
+        for c in C.filter(Program=query):
+            output.append(c)
+
+    return render(request, "ProjectApp/search.html" ,{"output":output, "Q": query, "key":len(output)})
