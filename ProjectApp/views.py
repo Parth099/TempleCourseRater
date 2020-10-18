@@ -87,16 +87,20 @@ def CoursePage(request, dept, Id):
     return render(request, 'ProjectApp/C_page.html', context)
 
 def searchCourses(request, query):
-    if request.method == "POST":
-        print(request.POST)
     C = Course.objects.all()
     output = []
     for course in C:
         if query.lower() in course.CourseName.lower():
             output.append(course)
 
-    if C.filter(Program=query).count() > 0:
-        for c in C.filter(Program=query):
+    SET = C.filter(Program=query) | C.filter(CourseID=query)
+    if SET.count() > 0:
+        for c in SET:
             output.append(c)
+    
+    if request.method == "POST":
+        srcBar = request.POST.get('SearchBar', "")
+        if srcBar != "":
+            return redirect(f"/search/{srcBar}")
 
     return render(request, "ProjectApp/search.html" ,{"output":output, "Q": query, "key":len(output)})

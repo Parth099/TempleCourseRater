@@ -4,7 +4,7 @@
 <div class='row-md-1'>
     <div class=col-md-12>
                 <div class="card-body">
-                    <h2>Query: {{Q}}</h2>
+                    <h2>Query: "{{Q}}"</h2>
                     <br>
                     {% if key == 0 %}
                     <p>There are no results for <i>{{Q}}</i></p>
@@ -17,8 +17,8 @@
                         </tr>
                     {% for q in output %}
                         <tr>
-                            <td><a class="btn btn-primary  btn-sm btn-block" href="{% url 'CoursePage' q.Program q.CourseID %}">View</a></td>
-                            <td>{{q}}</td>
+                            <td><a class="btn btn-info  btn-sm btn-block" href="{% url 'CoursePage' q.Program q.CourseID %}">View</a></td>
+                            <td>{{q.Program}} - {{q}}</td>
                         </tr>                    
                     {% endfor %}
                     {% endif %}
