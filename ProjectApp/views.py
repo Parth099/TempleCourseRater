@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.forms import inlineformset_factory
+from .filters import CourseFilter
 from .models import *
 from .forms import *
 
@@ -11,34 +12,6 @@ def inputDB():
         i_0 = i[0].split(" ")
         C = Course(CourseID=i_0[1],Program=i_0[0],CourseName=i[1])
         C.save()
-
-def index(request):
-    form = CourseForm()
-    if request.method == "POST":
-        srcBar = request.POST.get('SearchBar', "")
-        if srcBar != "":
-            return searchCourses(request, srcBar)
-        form = CourseForm(request.POST)
-        if form.is_valid():
-            if request.POST.get('CourseName', "") == "":
-                try:
-                    P0 = request.POST['Program'].upper()
-                    C = Course.objects.get(CourseID=request.POST['CourseID'].upper(), Program=P0)
-                    return redirect(f'/{C.Program}/{C.CourseID}')
-                except:
-                    pass
-            else:
-                try:
-                    C = Course.objects.get(CourseName=request.POST['CourseName'])
-                    return redirect(f'/{C.Program}/{C.CourseID}')
-                except:
-                    var = request.POST['CourseName']
-                    return redirect(f'/search/{var}')
-
-        
-        return redirect('/')
-    context = {'form':form,}
-    return render(request, 'ProjectApp/index.html', {'form':form})
 
 def CoursePage(request, dept, Id):
 
@@ -104,3 +77,56 @@ def searchCourses(request, query):
             return redirect(f"/search/{srcBar}")
 
     return render(request, "ProjectApp/search.html" ,{"output":output, "Q": query, "key":len(output)})
+
+def index(request): #STD page
+
+    CoursesArray = Course.objects.all()
+    init_count = len(CoursesArray)
+
+    CFilter = CourseFilter(request.GET, queryset=CoursesArray)
+    CoursesArray = CFilter.qs
+    final_count = len(CoursesArray)
+    flag =  final_count if final_count > 0 and final_count != init_count else 0
+    #pass in to render
+
+    context = {
+                'form':CFilter,
+                'query': CoursesArray,
+                'flag': flag if final_count > 0 else -1,
+    }
+    return render(request, 'ProjectApp/index.html', context)
+
+
+
+
+'''
+#defunct searching
+
+def index(request):
+    form = CourseForm()
+    if request.method == "POST":
+        srcBar = request.POST.get('SearchBar', "")
+        if srcBar != "":
+            return searchCourses(request, srcBar)
+        form = CourseForm(request.POST)
+        if form.is_valid():
+            if request.POST.get('CourseName', "") == "":
+                try:
+                    P0 = request.POST['Program'].upper()
+                    C = Course.objects.get(CourseID=request.POST['CourseID'].upper(), Program=P0)
+                    return redirect(f'/{C.Program}/{C.CourseID}')
+                except:
+                    pass
+            else:
+                try:
+                    C = Course.objects.get(CourseName=request.POST['CourseName'])
+                    return redirect(f'/{C.Program}/{C.CourseID}')
+                except:
+                    var = request.POST['CourseName']
+                    return redirect(f'/search/{var}')
+
+        
+        return redirect('/')
+    context = {'form':form,}
+    return render(request, 'ProjectApp/index.html', {'form':form})
+'''

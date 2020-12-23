@@ -1,3 +1,8 @@
 #blue{
     color: rgb(0, 70, 175);
 }
+#center {
+    margin: auto;
+    border: 3px solid green;
+    padding: 20px;
+  }

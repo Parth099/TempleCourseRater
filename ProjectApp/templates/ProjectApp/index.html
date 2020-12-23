@@ -1,29 +1,83 @@
 {% extends 'ProjectApp/main.html' %}
 
 {% block content %}
-<br>
 
-<div class='row'>
-    <div class=col-md-3>
-        <div class='card card-body border-success'>
-            <form action="" method="POST">
-                {% csrf_token %}
-                {{form.as_p}}
-                <label for="CourseName">CourseName:</label>
-                <input type="text" id="CourseName" name="CourseName">
-                <input class="btn btn-success btn-sm" type="submit" name='submit' value="Search">
-            </form>
-        </div>
+{% load widget_tweaks %}
+
+<div class="row">
+
+  <div class="col-md">
+    <div class='card card-body'>
+        <form action="" method="GET">
+
+          <div class="well">
+            <h4 style="margin-top: 0">Precise Search</h4>
+            <div class="row">
+              <div class="form-group col-sm-4 col-md-3">
+                {{ form.form.Program.label_tag}}
+                {% render_field form.form.Program class="form-control" %}
+
+              </div>
+              <div class="form-group col-sm-4 col-md-3">
+                {{ form.form.CourseID.label_tag}}
+                {% render_field form.form.CourseID class="form-control" %}
+
+              </div>
+            </div>
+          </div>
+          
+            
+
+
+
+          <input class="btn btn-success btn-sm" type="submit" name='submit' value="Search">
+        
+        
+          {% if flag < 0 %}
+          <small class="text-muted"><p>Your Search Produced 0 Results</p></small>
+          {% endif %}
+
+
+      </form>
     </div>
-    <div class=col-md-4>
-        <div class='card card-body border-info'>
-            <h4>How to Search:</h4>
-            <p>There are 2 ways to Search, using a combination of parameters. This can be ID and Program. The Program is the Department (Math, Cis, ACCT, ...). Or it can be a keyword Search in the CourseName field.</p> 
-            <small>Note the Search Bar at the top is a General Search, meaning it takes in keyword</small>
-                
+  </div>
+
+	<div class="col-md">
+
+    <div class="card text-white bg-primary mb-3" style="max-width: 50%;">
+        <div class="card-header">How to Search:</div>
+        <div class="card-body">
+          <h5 class="card-title">A Guide</h5>
+          <p class="card-text">There are 2 ways to Search, using a combination of parameters. This can be ID and Program. The Program is the Department (Math, Cis, ACCT, ...). Or it can be a keyword Search in the CourseName field.
+          <small>Note the Search Bar at the top is a General Search, meaning it takes in keyword</small></p>
         </div>
-    </div>
+      </div>
+    </div>  
+  <br>
+
 </div>
 
 
+  {% if flag > 0 %}
+  <div class='row-md-1'>
+    <div class=col-md-12>
+      <h3>
+        Your Search Produced
+        <small class="text-muted">{{flag}} Results</small>
+      </h3>
+      <table class="table table-sm">
+          <tr>
+            <th>Link</th>
+            <th>Course</th>
+          </tr>
+          {% for q in query %}
+          <tr>
+            <td><a class="btn btn-info  btn-sm btn-block" href="{% url 'CoursePage' q.Program q.CourseID %}">View</a></td>
+            <td>{{q.Program}} - {{q}}</td>
+          </tr>
+          {% endfor %}
+        </table>
+      {% endif %}
+  </div>
+</div>
 {% endblock %}
