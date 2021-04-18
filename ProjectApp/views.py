@@ -5,6 +5,9 @@ from .filters import CourseFilter
 from .models import *
 from .forms import *
 
+from django.db import connection
+cursor = connection.cursor()
+
 ACCT = [['ACCT 2101', 'Financial Accounting'], ['ACCT 2102', 'Managerial Accounting'], ['ACCT 2501', 'Survey of Accounting'], ['ACCT 2521', 'Cost Accounting'], ['ACCT 2901', 'Honors Financial Accounting'], ['ACCT 2902', 'Honors Managerial Accounting'], ['ACCT 3511', 'Intermediate Accounting I'], ['ACCT 3512', 'Intermediate Accounting II'], ['ACCT 3526', 'Accounting Information Systems'], ['ACCT 3531', 'Federal Taxes on Income'], ['ACCT 3533', 'Advanced Accounting'], ['ACCT 3561', 'International Accounting'], ['ACCT 3580', 'Special Topics - Accounting'], ['ACCT 3581', 'Co-operative Experience in Accounting'], ['ACCT 3582', 'Independent Study'], ['ACCT 3596', 'Auditing'], ['ACCT 3911', 'Honors Intermediate Accounting I'], ['ACCT 3999', 'Honors Thesis I'], ['ACCT 4501', 'Accounting Senior Seminar'], ['ACCT 4502', 'Senior Seminar - Management Accounting'], ['ACCT 4999', 'Honors Senior Thesis II']]
 def inputDB():
     #CourseID Program CourseName
@@ -60,6 +63,7 @@ def CoursePage(request, dept, Id):
     return render(request, 'ProjectApp/C_page.html', context)
 
 def searchCourses(request, query):
+    print("HI")
     C = Course.objects.all()
     output = []
     for course in C:
@@ -82,16 +86,45 @@ def index(request): #STD page
 
     CoursesArray = Course.objects.all()
     init_count = len(CoursesArray)
+    # print(request.GET)
+    program= request.GET.get('Program')
+    courseid = request.GET.get('CourseID')
+    # ProgramAPPX= request.GET.get('ProgramAPPX')
+    # CourseNumA= request.GET.get('CourseNumA')
+    # CourseNumB= request.GET.get('CourseNumB')
 
     CFilter = CourseFilter(request.GET, queryset=CoursesArray)
     CoursesArray = CFilter.qs
-    final_count = len(CoursesArray)
-    flag =  final_count if final_count > 0 and final_count != init_count else 0
+
+    # print(CoursesArray)
+
+    CoursesArray2 = []
+    if (program is not None and courseid is not None):
+        if (len(program) != 0 and len(courseid) != 0):
+            sqlstatement = "SELECT * FROM ProjectApp_course WHERE Program LIKE %" + program +"% AND CourseID=" + courseid
+        elif (len(courseid) != 0 and len(program) == 0):
+            sqlstatement = "SELECT * FROM ProjectApp_course WHERE CourseID=" + courseid
+        elif (len(program) != 0 and len(courseid) == 0):
+            sqlstatement = "SELECT * FROM ProjectApp_course WHERE Program LIKE %"  + program + "%"
+        else:
+            sqlstatement = "SELECT * FROM ProjectApp_course"
+
+
+        print("\n\n\n" + sqlstatement+  "\n\n")
+
+        for c in Course.objects.raw(sqlstatement):
+            CoursesArray2.append(c)
+
+    # print(CoursesArray2)
+
+    final_count = len(CoursesArray2)
+    # flag =  final_count if final_count > 0 and final_count != init_count else 0
+    flag = 1
     #pass in to render
 
     context = {
                 'form':CFilter,
-                'query': CoursesArray,
+                'query': CoursesArray2,
                 'flag': flag if final_count > 0 else -1,
     }
     return render(request, 'ProjectApp/index.html', context)
